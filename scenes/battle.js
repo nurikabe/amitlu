@@ -1,18 +1,19 @@
 var Character = new Phaser.Class({
     Extends: Phaser.GameObjects.Sprite,
 
-    initialize: function Character(scene, x, y, texture, frame, type, hp, damage) {
-        if (frame) {
-            Phaser.GameObjects.Sprite.call(this, scene, x, y, texture, frame);
-        } else {
-            Phaser.GameObjects.Sprite.call(this, scene, x, y, texture);
-            this.setScale(2);
-            this.anims.play(texture + '-fight');
-        }
-
+    initialize: function Character(type, hp, damage) {
         this.type = type;
         this.maxHp = this.hp = hp;
         this.damage = damage; // default damage
+    },
+
+    setSprite: function(scene, x, y, texture, scale = 1, frame = null) {
+        Phaser.GameObjects.Sprite.call(this, scene, x, y, texture, frame);
+        this.setScale(scale);
+    },
+
+    animate: function(texture) {
+        this.anims.play(texture);
     },
 
     attack: function(target) {
@@ -54,18 +55,24 @@ var BattleScene = new Phaser.Class({
         // Green background
         this.cameras.main.setBackgroundColor('rgba(0, 200, 0, 0.5)');
 
-        // Warrior
-        var warrior = new Player(this, 250, 50, 'player', 1, 'Warrior', 100, 20);
+        // Players
+        var warrior = new Player('Warrior', 100, 20);
+        warrior.setSprite(this, 250, 50, 'player', 2, 1);
         this.add.existing(warrior);
 
-        // Mage
-        var mage = new Player(this, 250, 100, 'player', 4, 'Mage', 80, 8);
+        var mage = new Player('Mage', 80, 8);
+        mage.setSprite(this, 250, 100, 'player', 2, 4);
         this.add.existing(mage);
 
-        var minotaur = new Enemy(this, 50, 50, 'minotaur', null,'Minotaur', 50, 3);
+        // Enemies
+        var minotaur = new Enemy('Minotaur', 50, 3);
+        minotaur.setSprite(this, 50, 50, 'minotaur-fight', 2);
+        minotaur.animate('minotaur-fight');
         this.add.existing(minotaur);
 
-        var santa = new Enemy(this, 50, 100, 'santa', null, 'Santa', 50, 3);
+        var santa = new Enemy('Santa', 50, 3);
+        santa.setSprite(this, 50, 100, 'santa-fight', 2);
+        santa.animate('santa-fight');
         this.add.existing(santa);
 
         console.log(warrior.type, warrior.hp);

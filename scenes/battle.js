@@ -5,15 +5,9 @@ var Character = new Phaser.Class({
         if (frame) {
             Phaser.GameObjects.Sprite.call(this, scene, x, y, texture, frame);
         } else {
-            //Phaser.GameObjects.Anims.call();
-            foo = scene.anims.create({
-                key: 'fight',
-                frames: scene.anims.generateFrameNames(texture),
-                frameRate: 10,
-                repeat: -1
-            });
-            //scene.anims.play('fight', true);
             Phaser.GameObjects.Sprite.call(this, scene, x, y, texture);
+            this.setScale(2);
+            this.anims.play(texture + '-fight');
         }
 
         this.type = type;
@@ -68,11 +62,11 @@ var BattleScene = new Phaser.Class({
         var mage = new Player(this, 250, 100, 'player', 4, 'Mage', 80, 8);
         this.add.existing(mage);
 
-        var santa = new Enemy(this, 50, 50, 'santa', null, 'Santa', 50, 3);
-        this.add.existing(santa);
+        var minotaur = new Enemy(this, 50, 50, 'minotaur', null,'Minotaur', 50, 3);
+        this.add.existing(minotaur);
 
-        var dragonOrange = new Enemy(this, 50, 100, 'dragonorrange', null,'Orange Dragon', 50, 3);
-        this.add.existing(dragonOrange);
+        var santa = new Enemy(this, 50, 100, 'santa', null, 'Santa', 50, 3);
+        this.add.existing(santa);
 
         console.log(warrior.type, warrior.hp);
         console.log(santa.type, santa.hp);
@@ -84,7 +78,7 @@ var BattleScene = new Phaser.Class({
         console.log(santa.type, santa.hp);
 
         this.players = [ warrior, mage ];
-        this.enemies = [ santa, dragonOrange ];
+        this.enemies = [ santa, minotaur ];
 
         // Players and enemies
         this.units = this.players.concat(this.enemies);

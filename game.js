@@ -16,7 +16,7 @@ var config = {
         BootScene,
         WorldScene,
         BattleScene,
-        BattleSceneUI
+        BattleSceneStatus
     ]
 };
 

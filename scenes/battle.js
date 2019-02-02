@@ -1,8 +1,15 @@
+var currentCharacter = null;
+
 var Character = new Phaser.Class({
     Extends: Phaser.GameObjects.Sprite,
 
     initialize: function Character(scene, x, y, texture, frame) {
+        console.log(scene);
         Phaser.GameObjects.Sprite.call(this, scene, x, y, texture, frame);
+        this.setInteractive();
+        this.on('pointerdown', function() {
+            scene.currentCharacter = null;
+        }, this);
     },
 
     setAttributes: function(type, hp, damage) {
@@ -55,6 +62,8 @@ var BattleScene = new Phaser.Class({
 
     Extends: Phaser.Scene,
 
+    currentCharacter: null,
+
     initialize: function BattleScene() {
         Phaser.Scene.call(this, { key: 'BattleScene' });
     },
@@ -73,12 +82,12 @@ var BattleScene = new Phaser.Class({
         this.add.existing(mage);
 
         // Enemies
-        var minotaur = new Enemy(this, 50, 50, 'minotaur-fight', 2);
+        var minotaur = new Enemy(this, 60, 50);
         minotaur.setAttributes('Minotaur', 50, 3);
         minotaur.animate('minotaur-fight');
         this.add.existing(minotaur);
 
-        var santa = new Enemy(this, 50, 100, 'santa-fight', 2);
+        var santa = new Enemy(this, 60, 100);
         santa.setAttributes('Santa', 50, 3);
         santa.animate('santa-fight');
         this.add.existing(santa);
@@ -97,7 +106,9 @@ var BattleScene = new Phaser.Class({
     },
 
     update: function() {
-        this.nextTurn();
+        if (!this.currentCharacter) {
+            this.nextTurn();
+        }
     },
 
     nextTurn: function() {
@@ -106,10 +117,10 @@ var BattleScene = new Phaser.Class({
             this.index = 0;
         }
 
-        var unit = this.units[this.index];
+        this.currentCharacter = this.units[this.index];
 
-        this.status.text.setText(unit.type + "'s turn");
-        unit.choose();
+        this.status.text.setText(this.currentCharacter.type + "'s turn");
+        this.currentCharacter.choose();
 
         this.index++;
     },

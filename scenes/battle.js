@@ -18,6 +18,10 @@ var Character = new Phaser.Class({
         this.damage = damage; // default damage
     },
 
+    setOpponents: function(opponents) {
+        this.opponnents = opponents;
+    },
+
     animate: function(texture) {
         this.anims.play(texture);
     },
@@ -41,6 +45,7 @@ var Enemy = new Phaser.Class({
 
     // Randomly choose a player to attack
     choose: function() {
+        return this.opponnents[Math.floor(Math.random() * 2)];
     }
 });
 
@@ -55,6 +60,7 @@ var Player = new Phaser.Class({
 
     // Allow the user to pick an enemy to attack
     choose: function() {
+        return this.opponnents[0];
     }
 });
 
@@ -92,8 +98,15 @@ var BattleScene = new Phaser.Class({
         santa.animate('santa-fight');
         this.add.existing(santa);
 
+        // Groups
         this.players = [ warrior, mage ];
         this.enemies = [ santa, minotaur ];
+
+        warrior.setOpponents(this.enemies);
+        mage.setOpponents(this.enemies);
+
+        santa.setOpponents(this.players);
+        minotaur.setOpponents(this.players);
 
         // Players and enemies
         this.units = this.players.concat(this.enemies);
@@ -118,9 +131,17 @@ var BattleScene = new Phaser.Class({
         }
 
         this.currentCharacter = this.units[this.index];
+        console.log(this.currentCharacter);
 
-        this.status.text.setText(this.currentCharacter.type + "'s turn");
-        this.currentCharacter.choose();
+        var text = this.currentCharacter.type + "'s turn\n";
+
+        var opponent = this.currentCharacter.choose();
+        text += this.currentCharacter.type + " attacks " + opponent.type + "\n";
+
+        this.currentCharacter.attack(opponent);
+        text += opponent.type + " has " + opponent.hp + " HP left!";
+
+        this.status.text.setText(text);
 
         this.index++;
     },

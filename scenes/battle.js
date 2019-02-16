@@ -4,7 +4,6 @@ var Character = new Phaser.Class({
     Extends: Phaser.GameObjects.Sprite,
 
     initialize: function Character(scene, x, y, texture, frame) {
-        console.log(scene);
         Phaser.GameObjects.Sprite.call(this, scene, x, y, texture, frame);
         this.setInteractive();
         this.on('pointerdown', function() {
@@ -32,6 +31,23 @@ var Character = new Phaser.Class({
 
     takeDamage: function(damage) {
         this.hp -= damage;
+        if (this.hp <= 0) {
+            this.die();
+        }
+    },
+
+    status: function() {
+        text = this.type + " has ";
+        if (this.hp > 0) {
+            text += this.hp + " HP left!";
+        } else {
+            text += "been defeated!";
+        }
+        return text;
+    },
+
+    die: function() {
+        this.visible = false;
     }
 });
 
@@ -88,12 +104,12 @@ var BattleScene = new Phaser.Class({
         this.add.existing(mage);
 
         // Enemies
-        var minotaur = new Enemy(this, 60, 50);
+        var minotaur = new Enemy(this, 65, 45);
         minotaur.setAttributes('Minotaur', 50, 3);
         minotaur.animate('minotaur-fight');
         this.add.existing(minotaur);
 
-        var santa = new Enemy(this, 60, 100);
+        var santa = new Enemy(this, 65, 105);
         santa.setAttributes('Santa', 50, 3);
         santa.animate('santa-fight');
         this.add.existing(santa);
@@ -131,7 +147,6 @@ var BattleScene = new Phaser.Class({
         }
 
         this.currentCharacter = this.units[this.index];
-        console.log(this.currentCharacter);
 
         var text = this.currentCharacter.type + "'s turn\n";
 
@@ -139,7 +154,7 @@ var BattleScene = new Phaser.Class({
         text += this.currentCharacter.type + " attacks " + opponent.type + "\n";
 
         this.currentCharacter.attack(opponent);
-        text += opponent.type + " has " + opponent.hp + " HP left!";
+        text += opponent.status();
 
         this.status.text.setText(text);
 

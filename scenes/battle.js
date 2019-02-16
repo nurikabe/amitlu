@@ -1,5 +1,3 @@
-var currentCharacter = null;
-
 var Character = new Phaser.Class({
     Extends: Phaser.GameObjects.Sprite,
 
@@ -9,7 +7,8 @@ var Character = new Phaser.Class({
         this.setTint(0xcccccc);
 
         this.on('pointerdown', function() {
-            scene.currentCharacter = null;
+            //scene.currentCharacter = null;
+            scene.currentOpponent = this;
         }, this);
 
         this.on('pointerover', function() {
@@ -69,7 +68,7 @@ var Enemy = new Phaser.Class({
     },
 
     // Randomly choose a player to attack
-    choose: function() {
+    chooseOpponent: function() {
         return this.opponnents[Math.floor(Math.random() * 2)];
     }
 });
@@ -84,8 +83,7 @@ var Player = new Phaser.Class({
     },
 
     // Allow the user to pick an enemy to attack
-    choose: function() {
-        return this.opponnents[0];
+    chooseOpponent: function() {
     }
 });
 
@@ -94,6 +92,7 @@ var BattleScene = new Phaser.Class({
     Extends: Phaser.Scene,
 
     currentCharacter: null,
+    currentOpponent: null,
 
     initialize: function BattleScene() {
         Phaser.Scene.call(this, { key: 'BattleScene' });
@@ -147,6 +146,28 @@ var BattleScene = new Phaser.Class({
         if (!this.currentCharacter) {
             this.nextTurn();
         }
+
+        if (this.currentCharacter.hp <= 0) {
+            return;
+        }
+
+        this.status.text.setText(this.currentCharacter.type + "'s turn");
+
+        if (!this.currentOpponent) {
+            this.currentOpponent = this.currentCharacter.chooseOpponent();
+        }
+
+        // If an opponents has been chosen, attack!
+        if (this.currentOpponent) {
+            this.currentCharacter.attack(this.currentOpponent);
+            text = this.currentCharacter.type + " attacks " + this.currentOpponent.type + "\n";
+            text += this.currentOpponent.status();
+            this.status.text.setText(text);
+
+            // Reset
+            this.currentCharacter = null;
+            this.currentOpponent = null;
+        }
     },
 
     nextTurn: function() {
@@ -155,19 +176,7 @@ var BattleScene = new Phaser.Class({
             this.index = 0;
         }
 
-        this.currentCharacter = this.units[this.index];
-
-        var text = this.currentCharacter.type + "'s turn\n";
-
-        var opponent = this.currentCharacter.choose();
-        text += this.currentCharacter.type + " attacks " + opponent.type + "\n";
-
-        this.currentCharacter.attack(opponent);
-        text += opponent.status();
-
-        this.status.text.setText(text);
-
-        this.index++;
+        this.currentCharacter = this.units[this.index++];
     },
 });
 
@@ -185,7 +194,7 @@ var BattleSceneStatus = new Phaser.Class({
         this.graphics.fillStyle(0x031f4c, 1);
         this.graphics.strokeRect(10, 150, 300, 80);
         this.graphics.fillRect(10, 151, 299, 79);
-        this.text = this.add.text(25, 160, 'Battle!', { fontSize: '18px', fill: '#fff' });
+        this.text = this.add.text(20, 160, 'Battle!', { fontSize: '18px', fill: '#fff' });
     }
 
 });

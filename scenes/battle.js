@@ -6,10 +6,18 @@ var Character = new Phaser.Class({
     initialize: function Character(scene, x, y, texture, frame) {
         Phaser.GameObjects.Sprite.call(this, scene, x, y, texture, frame);
         this.setInteractive({useHandCursor: true, pixelPerfect: true});
+        this.setTint(0xcccccc);
+
         this.on('pointerdown', function() {
             scene.currentCharacter = null;
         }, this);
 
+        this.on('pointerover', function() {
+            this.clearTint();
+        }, this);
+        this.on('pointerout', function() {
+            this.setTint(0xcccccc);
+        }, this);
     },
 
     setAttributes: function(type, hp, damage) {
@@ -105,12 +113,12 @@ var BattleScene = new Phaser.Class({
         this.add.existing(mage);
 
         // Enemies
-        var minotaur = new Enemy(this, 65, 45);
+        var minotaur = new Enemy(this, 65, 50);
         minotaur.setAttributes('Minotaur', 50, 3);
         minotaur.animate('minotaur-fight');
         this.add.existing(minotaur);
 
-        var santa = new Enemy(this, 65, 105);
+        var santa = new Enemy(this, 65, 100);
         santa.setAttributes('Santa', 50, 3);
         santa.animate('santa-fight');
         this.add.existing(santa);

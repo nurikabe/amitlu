@@ -1,3 +1,5 @@
+var PAUSED = false;
+
 var Character = new Phaser.Class({
     Extends: Phaser.GameObjects.Sprite,
 
@@ -141,6 +143,10 @@ var BattleScene = new Phaser.Class({
     },
 
     update: function() {
+        if (PAUSED) {
+            return;
+        }
+
         if ((this.players[0].hp + this.players[1].hp) <= 0) {
             alert('Player defeated!');
         }
@@ -172,6 +178,9 @@ var BattleScene = new Phaser.Class({
             // Reset
             this.currentCharacter = null;
             this.currentOpponent = null;
+
+            PAUSED = true;
+            setTimeout(function() { PAUSED = false }, 1500);
         }
     },
 

@@ -29,6 +29,8 @@ var Character = new Phaser.Class({
         this.opponnents = opponents;
     },
 
+    chooseOpponent: function() {},
+
     animate: function(texture) {
         this.anims.play(texture);
     },
@@ -68,7 +70,7 @@ var Enemy = new Phaser.Class({
     },
 
     // Randomly choose a player to attack
-    chooseOpponent: function() {
+    chooseOpponent: function(opponent) {
         return this.opponnents[Math.floor(Math.random() * 2)];
     }
 });
@@ -80,10 +82,6 @@ var Player = new Phaser.Class({
         Character.call(this, scene, x, y, texture, frame);
         this.flipX = true;
         this.setScale(2);
-    },
-
-    // Allow the user to pick an enemy to attack
-    chooseOpponent: function() {
     }
 });
 
@@ -143,22 +141,29 @@ var BattleScene = new Phaser.Class({
     },
 
     update: function() {
+        if ((this.players[0].hp + this.players[1].hp) <= 0) {
+            alert('Player defeated!');
+        }
+
+        if ((this.enemies[0].hp + this.enemies[1].hp) <= 0) {
+            alert('Enemies defeated!');
+        }
+
         if (!this.currentCharacter) {
             this.nextTurn();
         }
 
         if (this.currentCharacter.hp <= 0) {
+            this.currentCharacter = null;
             return;
         }
 
         this.status.text.setText(this.currentCharacter.type + "'s turn");
 
+        // If an opponents has been chosen, attack!
         if (!this.currentOpponent) {
             this.currentOpponent = this.currentCharacter.chooseOpponent();
-        }
-
-        // If an opponents has been chosen, attack!
-        if (this.currentOpponent) {
+        } else {
             this.currentCharacter.attack(this.currentOpponent);
             text = this.currentCharacter.type + " attacks " + this.currentOpponent.type + "\n";
             text += this.currentOpponent.status();

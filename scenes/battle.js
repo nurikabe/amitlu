@@ -5,15 +5,16 @@ var Character = new Phaser.Class({
 
     initialize: function Character(scene, x, y, texture, frame) {
         Phaser.GameObjects.Sprite.call(this, scene, x, y, texture, frame);
-        this.setInteractive();
+        this.setInteractive({useHandCursor: true, pixelPerfect: true});
         this.on('pointerdown', function() {
             scene.currentCharacter = null;
         }, this);
+
     },
 
     setAttributes: function(type, hp, damage) {
         this.type = type;
-        this.maxHp = this.hp = hp;
+        this.hp = hp;
         this.damage = damage; // default damage
     },
 

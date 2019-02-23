@@ -1,3 +1,4 @@
+var EXIT = false;
 var PAUSED = false;
 
 var Character = new Phaser.Class({
@@ -49,11 +50,11 @@ var Character = new Phaser.Class({
     },
 
     status: function() {
-        text = this.type + " has ";
+        text = this.type;
         if (this.hp > 0) {
-            text += this.hp + " HP left!";
+            text += ' has ' + this.hp + ' HP left!';
         } else {
-            text += "been defeated!";
+            text += ' defeated!';
         }
         return text;
     },
@@ -147,12 +148,21 @@ var BattleScene = new Phaser.Class({
             return;
         }
 
+        if (EXIT) {
+            this.scene.sleep('BattleScene');
+            this.scene.sleep('BattleSceneStatus');
+            this.scene.switch('WorldScene');
+        }
+
         if ((this.players[0].hp + this.players[1].hp) <= 0) {
             alert('Player defeated!');
         }
 
         if ((this.enemies[0].hp + this.enemies[1].hp) <= 0) {
-            alert('Enemies defeated!');
+            this.status.text.setText('Enemies defeated!');
+            EXIT = true;
+            PAUSED = true;
+            setTimeout(function() { PAUSED = false }, 2000);
         }
 
         if (!this.currentCharacter) {

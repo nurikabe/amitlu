@@ -20,6 +20,8 @@ var Character = new Phaser.Class({
         this.on('pointerout', function() {
             this.setTint(0xcccccc);
         }, this);
+
+
     },
 
     setAttributes: function(type, hp, damage) {
@@ -61,6 +63,14 @@ var Character = new Phaser.Class({
 
     die: function() {
         this.visible = false;
+    },
+
+    highlight: function() {
+        this.setTint(0x99ff99);
+    },
+
+    reset: function() {
+        this.clearTint();
     }
 });
 
@@ -144,14 +154,14 @@ var BattleScene = new Phaser.Class({
     },
 
     update: function() {
-        if (PAUSED) {
-            return;
-        }
-
         if (EXIT) {
             this.scene.sleep('BattleScene');
             this.scene.sleep('BattleSceneStatus');
             this.scene.switch('WorldScene');
+        }
+
+        if (PAUSED) {
+            return;
         }
 
         if ((this.players[0].hp + this.players[1].hp) <= 0) {
@@ -160,9 +170,9 @@ var BattleScene = new Phaser.Class({
 
         if ((this.enemies[0].hp + this.enemies[1].hp) <= 0) {
             this.status.text.setText('Enemies defeated!');
-            EXIT = true;
             PAUSED = true;
-            setTimeout(function() { PAUSED = false }, 2000);
+            setTimeout(function() { PAUSED = false; EXIT = true; }, 2000);
+            return;
         }
 
         if (!this.currentCharacter) {
@@ -186,6 +196,7 @@ var BattleScene = new Phaser.Class({
             this.status.text.setText(text);
 
             // Reset
+            this.currentCharacter.reset()
             this.currentCharacter = null;
             this.currentOpponent = null;
 
@@ -201,6 +212,7 @@ var BattleScene = new Phaser.Class({
         }
 
         this.currentCharacter = this.units[this.index++];
+        this.currentCharacter.highlight();
     },
 });
 
